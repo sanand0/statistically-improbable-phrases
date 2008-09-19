@@ -1,0 +1,16 @@
+application:    sip
+version:    1
+runtime:    python
+api_version:    1
+
+handlers:
+- url: /
+  script: sip.py
+
+- url: /i/(.*)
+  static_files: i/\1
+  upload: i/(.*)
+
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
