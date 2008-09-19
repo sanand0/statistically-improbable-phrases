@@ -1,0 +1,195 @@
+<!doctype html>
+<html><head>
+<title>Statistically Improbable Phrases</title>
+<style>
+html,body,div,span,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,code,em,font,img,strike,dd,dl,dt,li,ol,ul,form,label,table,caption,tbody,tfoot,thead,tr,th,td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 100%;
+    font-family: inherit;
+    text-align: left;
+    background: transparent;
+    vertical-align: baseline;
+}
+a img, :link img, :visited img { border: 0; }
+table { border-collapse: collapse; border-spacing: 0; }
+ol, ul { list-style: none; }
+blockquote, q { quotes: none; }
+
+body { font-family: Arial, sans-serif; font-size: 13px; margin: 30px; }
+h1   { font: 2.5em "Times New Roman", serif; margin: 0 0 0.5em 0; }
+#url, code { font-family: monaco,"Lucida Console",courier,mono-space; }
+#url { border: 1px solid #cccccc; padding: 0.3em 0.4em 0.15em; width:20em; }
+hr   { border-width: 1px 0 0; border-style: dotted; margin: 10px 0 }
+#help { line-height: 1.7; width: 30em; }
+#help p { margin: 1em 0; }
+ul   { list-style: disc; margin-left: 1em; }
+#controls { display:none; }
+#concordance { font-family:monospace; position:absolute; background-color: #ffc; border: 1px solid #ccc; padding: 10px; white-space: nowrap; width:600px; display:none; }
+#recenturls td { white-space: nowrap; padding-right: 1em; border-bottom: 1px solid #eee; }
+#notes p { margin: 1em 0; }
+#embedcode { width: 60em; font-size: 80%; }
+pre#permalink { font-family: monospace; border: 1px solid #ccc; }
+
+.ui-slider { width: 200px; height: 23px; position: relative; background-repeat: no-repeat; background-position: center center; }
+.ui-slider-handle { position: absolute; z-index: 1; height: 23px; width: 12px; top: 0px; left: 0px; background-image: url(i/slider-handle.gif);  }
+.ui-slider-handle-active { border: 1px dotted black;  }
+.ui-slider-disabled .ui-slider-handle { opacity: 0.5; filter: alpha(opacity=50); }
+.ui-slider-range { position: absolute; background: #50A029; opacity: 0.3; filter: alpha(opacity=30); width: 100%; height: 100%; }
+
+/* Default slider backgrounds */
+.ui-slider, .ui-slider-1 { background-image: url(i/slider-bg-1.png); }
+</style>
+<script>
+function validate() {
+    var url = document.getElementById("url").value;
+    if (url.match(/^https?:\/\//)) { return true; }
+    else { alert("Please type the full URL.\nIt should look like: http://www.something.com\nDon't forget the http:// at the beginning."); return false; }
+}
+</script>
+
+
+</head><body>
+<h1>Statistically improbable phrases{% if url %} for <a rel="nofollow" href="{{ url }}">{{ url }}</a> {% endif %}</h1>
+<form action="/" method="get" onsubmit="return validate()">
+    {% if not url %}
+        Pick a site: <input id="url" name="url" value="http://" />
+    {% else %}
+        <input id="url" name="url" value="{{ url }}" />
+    {% endif %}
+    <input id="submit" type="submit" value="Show" />
+    <br/><input id="usestop" name="usestop" type="checkbox" {% if usestop %}checked{% endif %}/> Don't skip common words (like "a", "an", "the", etc.)
+    </form>
+
+{% if html %}
+    <table id="controls">
+    <tr><td style="text-align:right; padding-right:1em;">Increase contrast          </td><td><div id="contrast_slider"></div></td></tr>
+    <tr><td style="text-align:right; padding-right:1em;">Ignore common English words</td><td><div id="min_pr_slider"></div>  </td></tr>
+    <tr><td style="text-align:right; padding-right:1em;">Ignore infrequent words    </td><td><div id="min_fr_slider"></div>  </td></tr>
+    <tr><td style="text-align:right; padding-right:1em;">Increase scale             </td><td><div id="size_slider"></div>    </td></tr>
+    </table>
+    <hr/>
+    <div id="sip">
+        {{ html }}
+    </div>
+    <hr/>
+    <div id="notes">
+        <p>Dark words are less often used in English. Big words occur more often in the text.</p>
+        <p>To embed this in your web page, copy and paste the code below:
+        <br/><textarea id="embedcode" rows="4"></textarea></p>
+        <p>... or copy and paste the following link into your page:</p>
+        <pre id="permalink">&lt;iframe src="http://sip.s-anand.net/?url={{ url }}&alt=html"&gt;&lt;/iframe&gt;</pre>
+        <p>Created by <a href="http://www.s-anand.net/">Anand</a></p>
+    </div>
+    <div id="concordance"></div>
+
+    <script type="text/javascript" src="i/ui.js"></script>
+    <script>
+    // Fix IE 6.0 flicker problem: http://dean.edwards.name/my/flicker.html and http://www.mister-pixel.com/
+    try { document.execCommand("BackgroundImageCache", false, true); } catch(err) {}
+
+    var font_scale = 10,
+        font_min   = 15,
+        contrast   = 0.15,
+        min_fr     = 0,
+        max_fr     = {% if max_fr %} {{ max_fr }} {% else %} 0 {% endif %},
+        min_pr     = 0,
+        text       = "{{ text }}";
+
+    function setStyle() {
+        var fr = +this.getAttribute("fr"), pr = +this.getAttribute("pr");
+        if (fr > min_fr && pr > min_pr) {
+            this.style.fontSize = Math.round(Math.log(fr - min_fr)*font_scale + font_min) + "px";
+            var c = (Math.round((1-Math.pow((pr - min_pr)/(1-min_pr),contrast)) * 255)).toString(16);
+            c = c.length == 1 ? "0" + c : c;
+            this.style.color = "#" + c + c + c;
+            this.style.display = "inline";
+        } else {
+            this.style.display = "none";
+        }
+    }
+    function refresh() { $("#sip span").each(setStyle); }
+    function donerefresh() {
+        $("#embedcode").val($("#sip").html()
+            .replace(/[fp]r\=".*?"/gi, "")
+            .replace(/jQuery\d+\=".*?"/gi, "")
+            .replace(/display:\s*inline\s*;?/gi, "")
+            .replace(/&/g, "&amp;")
+            .replace(/\s+/g, " ")
+            .replace(/> </g, ">\n<"));
+    }
+    function concordance(e) {
+        var s = this.innerHTML,
+            matches = text.match(new RegExp(".{0,30}\\b" + s + "\\b.{0,30}", "gi")),
+            el = $(this),
+            pos = el.offset(),
+            height = el.height(),
+            bodywidth = $(document.body).width(),
+            left = pos.left + 600 <= bodywidth ? pos.left : bodywidth - 600;
+        $("#concordance")
+            .html("..." + matches.join("...<br/>...").replace(new RegExp("\\b(" + s + ")\\b", "gi"), "<u>$1</u>") + "...")
+            .css({left:left, top:pos.top+height})
+            .show();
+    }
+
+    refresh();
+    donerefresh();
+    $("#controls").show();
+    $("#sip span").click(concordance);
+    $("#concordance").click(function() { $(this).hide(); });
+    $("#embedcode").focus(function() { this.select(); });
+
+    $('#min_fr_slider').slider  ( { min: 0, max: max_fr, startValue: min_fr,       slide: function(e,ui) { min_fr     = ui.value;         refresh(); }, change: donerefresh } );
+    $('#min_pr_slider').slider  ( { min: 0, max: 100,    startValue: min_pr*100,   slide: function(e,ui) { min_pr     = ui.value / 100.0; refresh(); }, change: donerefresh } );
+    $('#contrast_slider').slider( { min: 0, max: 100,    startValue: contrast*100, slide: function(e,ui) { contrast   = ui.value / 100.0; refresh(); }, change: donerefresh } );
+    $('#size_slider').slider    ( { min: 0, max: 40,     startValue: font_scale,   slide: function(e,ui) { font_scale = ui.value;         refresh(); }, change: donerefresh } );
+
+    </script>
+{% else %}
+    <hr/>
+    <div id="help">
+    <p><b><a href="http://www.amazon.com/gp/search-inside/sipshelp.html">What are Statistically Improbable Phrases?</a></b></p>
+    <p>They're phrases that occur more often in a piece of text than in general English. They can give you a sense of what the text is about.</p>
+    <p>The best way to understand this is to try it out. For example, to see which words occur specifically in Calvin &amp; Hobbes, type <code>http://s-anand.net/calvin_86.html</code> in the box above.</p>
+    <p>You'll see all words in the URL listed alphabetically.<br/>The <b>big</b> words occur <b>more often</b>.<br/>The <b>dark</b> words are <b>more improbable</b>.</p>
+    <p>P.S.: Technically these are statistically improbable <i>words</i>. I'll modify this to incorporate phrases soon.</p>
+    <p><a rel="me" href="http://www.s-anand.net/">Anand</a></p>
+    <hr/>
+    <b>Read more:</b>
+    <ul>
+        <li><a href="http://www.s-anand.net/Statistically_improbable_phrases.html">Statistically improbable phrases</a></li>
+        <li><a href="http://www.s-anand.net/Statistically_improbable_phrases_2.html">Statistically improbable phrases 2</a></li>
+        <li><a href="http://www.s-anand.net/Statistically_improbable_phrases_on_Google_AppEngine.html">Statistically improbable phrases on Google AppEngine</a></li>
+    </ul>
+    {% if urls %}
+        <hr/>
+        <b>Recent sites checked:</b><br/>
+        <table id="recenturls">
+        {% for url in urls %}
+            <tr><td><a rel='nofollow' href='{{ url }}'>{{ url}}</a></td><td><a href='#' title='{{ url }}' class='try'>try it</a></tr>
+        {% endfor %}
+        </table>
+    {% endif%}
+    </div>
+    <script type="text/javascript" src="i/ui.js"></script>
+    <script>
+    $(".try").click(function() {
+        $("#url").val($(this).attr("title"));
+        $("#submit").click();
+    });
+    </script>
+{% endif %}
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-137998-5");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body></html>

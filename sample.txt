@@ -1,0 +1,493 @@
+S Anand
+Statistically improbable phrases on Google AppEngine update
+
+I've added some interactivity to the Statistically improbable phrases application. You can now:
+
+    * Filter out stopwords
+    * Dynamically filter infrequent words and commonly used words
+    * Dynamically play with the contrast and font size
+
+Written on 12 Apr 2008 | comments
+Related articles:
+
+    * Statistically improbable phrases on Google AppEngine
+    * Chaining functions in Javascript
+    * Javascript error logging
+    * Website load distribution using Javascript
+
+... and more of Coding
+Statistically improbable phrases on Google AppEngine
+
+I read about Google AppEngine early this morning, and applied for an invite. Google's issuing beta invites to the first 10,000 users. I was pretty convinced I wasn't among those, but turns out I was lucky.
+
+AppEngine lets you write web apps that Google hosts. People have been highlighting that it give you access to the Google File System and BigTable for the first time. But to me, that isn't a big deal. (I'm not too worried about reliability, and MySQL / flat files work perfectly well for me as a data store.)
+
+What's more interesting unlike Amazon's EC2 and S3, this is free up to a certain quota. And you get a fair bit of processing power and bandwidth for free. One of the reasons I've held back on creating some apps was simply because it would take away too much bandwidth / CPU cycles from my site. (I've had this problem before.) Google quota is 10 GB of bandwidth per day (which is about 30 times what my site uses). And this is on Google's incredibly fast servers It also offers 200 million megacycles a day. That's like a dedicated 2.3 GHz processor -- better, because this is the average capacity, not peak capacity. The only restriction that really worries me is that only 3 apps are allowed per developer.
+
+So I decided to give a shot at publishing some code I'd kept in reserve for a long time. You may remember my statistical analysis of Calvin & Hobbes. For this, I'd created a script in Perl that could generate SIPs for any text. This is based on (a somewhat limited) 23MB corpus of ebooks that I had. I'd wanted to put that up on my website, but ...
+
+AppEngine only uses Python. So the first task was to get Python, and then to learn Python. The only saving grace was that I was just cutting-and-pasting most of the time. Google wasn't helping:
+
+Google AppEngine Over Quota Error
+
+Anyway, the site is up. You can view it at sip.s-anand.net for now. Just type a URL, and it'll tell you the improbable words in that site.
+
+Visit sip.s-anand.net
+
+Technical notes
+
+I realise that these are statistically improbable words, not phrases. I'll get to the phrases in a while.
+
+The logic is simple:
+
+    * Get the frequency of words in a corpus. I pre-generated this file. It has over 100,000 words.
+    * Get the URL as text. Rather than muck around with Python, I decided to use the W3 html2txt service.
+    * Convert the text to words. Splitting text into words is tricky. For now, I'm simply assuming that any group of letters is a word, and anything that's not a letter is a word delimiter.
+    * Find the relative frequency (improbability) of words. This is the frequency in the URL divided by the frequency in the corpus, normalised (i.e. scale it so that the maximum value is 1.0).
+    * Create a tag cloud. I use the word frequency as the size and the improbability as the colour. You need a bit of mathematical jugglery to get the pattern right. Right now, I'm taking the 6th root of the improbability and the logarithm of the frequency to get a reasonably smooth tag cloud.
+
+The source code is here.
+
+Update: 12-Apr-2008. I've added some interactivity. You can play with the contrast and font size, the filter out common or infrequent words.
+Written on 08 Apr 2008 | comments
+Related articles:
+
+    * Statistically improbable phrases on Google AppEngine
+    * Chaining functions in Javascript
+    * Javascript error logging
+    * Website load distribution using Javascript
+
+... and more of Coding
+Firefox 3 Beta 5 crashes
+
+I just upgraded from Firefox 3 Beta 4 to Beta 5. It's amazing how unstable Beta 5 is compared to the earlier version. Gmail crashes. Google maps crashes. Almost every other site I visit crashes. And looks like I'm not alone: doing a Google search for "Firefox 3 beta x crash" shows a consistently increasing number of results.
+
+Number of Google search results for Firefox 3 Beta crashes, by Beta version
+
+Update (8/Apr/08): As the comments rightly point out, this could simply be because more people use Beta 5. Here's the number of Google hits for "Firefox 3 Beta x" -- and it shows a clear increasing trend.
+
+Number of Google search results for Firefox 3 Beta, by Beta version
+
+So, adjusting for this, here's the relative crash frequency:
+
+% of Firefox 3 Beta crash mentions on Google, by Beta version
+
+Beta 5 still stands out.
+
+Maybe Google search results are not a good proxy. Maybe the mention of "crash" doesn't indicate the software itself crashing. But it sure crashes a lot more for me.
+Written on 07 Apr 2008 | comments
+Time management
+
+Some years ago, a friend asked me to write about how I manage my time. It seemed to him I was doing a good job of it, given that I had time to pursue my interests.
+
+It's something I tried to do consciously. Every few years, I used to go down the route of "time management". I'd read stuff and try it out.
+
+But over time, I've come to believe that "time" is not really "manageable". Think about it: are most of your actions planned? Me, I just react out of habit, no matter how well planned I try to be. What I do is largely driven by what I'm in the habit of doing.
+
+Not that time management advice is useless, but you'll end up not following most of it. You act on a fraction of what you read. A fraction of that turns into a habit. That's still useful. But the point is, rather than pick up 10 tips on time management, it's more useful to pick one or two pieces of advice that you like, and are likely to act on. (You won't do things you don't like anyway.)
+
+So time management is about acquiring habits that save time (and is not about reading tips that are tough to habitualise).
+
+That begs an obvious question and a subtle one. The obvious one is what habits save time? The subtle one is why save time?
+
+Why save time?
+
+You've probably heard the phrase "time is money". For a while, I took that statement literally. I tried to act by assigning monetary value to my time, and by doing the most profitable thing.
+
+I was making Rs 10,000 a month at that time. That's about Rs 50 an hour. So I figured I wouldn't do anything that earned me less than Rs 50 an hour outside of work. I mean, if I'm making Rs 50 an hour at work, why should I make any less outside?
+
+One small hitch. I wasn't making any money outside of work. In fact, I was spending money. So unless I took up a night job, or started freelancing, that rule of thumb was useless. (Besides, I didn't want to spend time outside of work working. I wanted to have fun. Watch movies, for instance.)
+
+So I needed a different way of handling this. If I spend 3 hours at a movie for Rs 60, that could be a benchmark. If something's more expensive than Rs 20/hour, I'd rather watch a movie. If it's less expensive, I'd do that. Take books, for instance. A typical novel would cost Rs 180 and I'd finish it in 12 hours. At Rs 15 / hour it's a more economical way of spending time.
+
+Except that it doesn't quite work that way. How much fun I had, had nothing to do with how much I paid for it.
+
+Frankly, in daily life, I don't think you can treat the phrase "time is money" literally. Time has nothing to do with money.
+
+Time is like money in a different way, though. By itself, it isn't worth much. Think about it. What can you do with money? Buy stuff you like. And if you can't, it's useless.
+
+Obelix: How silly! Fancy throwing out good onion soup to make room for sesterii! Asterix: But Obelix, with sesterii, you can buy onion soup! Obelix: That's the point! Why throw out the onion soup when it was in the cauldron already?
+
+If all you need is onion soup, why throw it out for sesterii?
+
+Time's like that. What can you do with time? Do stuff you like. And if you can't, it's useless.
+
+There are usually two reasons people want to manage time. One is where they don't enjoy something, and would rather spend as little time at it as possible. But look, if you don't enjoy that stuff, time management isn't your problem. You need to get out of your job or whatever. Managing time more efficiently is simply going to let you efficiently waste your time. (Though in the short run, that's probably the best you can do -- efficiently get rid of nuisances. I'll talk about that shortly.)
+
+The other reason is where they have too many (enjoyable) things to do, and can't do all of them. But hey, if you have too much enjoyable stuff, you don't have a problem! In a way, this is like wanting to buy many things and not having enough money. With money, you can earn more or wish for less. With time, you just have to wish for less. (Living longer may not be a practical option.) Just pick anything you like to do. Don't regret the stuff you can't. You only have 24 hours, and you're among the lucky few who can fill it with things you enjoy.
+
+So, I'm effectively saying, there's no point trying to do things more efficiently in the long run. Picking what you do is more important than doing it efficiently. (That roughly correlates to the third habit in Stephen Covey's Seven Habits: Put First Things First. It's the key to time management.)
+
+So, how do you pick what to do? You'd probably want to pick something that you like, or something that's good for you.
+
+But it's tricky to predict what you like.
+
+    * We don't know what we want. Sometimes, it's as simple as that -- we just don't know what we'd like to do.
+    * Too much of anything... I love watching movies, but I've never managed to watch more than 4 a day. I've tried breaking that record many times. Just doesn't work. At the end of the 4th movie, I'm sick and my bum is sore. Do I prefer movies to cleaning up? Usually. But by the end of the 4th, I'd rather clean up.
+    * Preferences are not consistent. I prefer a 7 megapixel camera to a 2 megapixel one. I prefer a cheaper camera to a more expensive one. So between a $100 2MP camera and a $200 7MP camera, I'm just making a wild guess.
+    * Preferences are not static. If I'm tired, I'd rather watch a movie I've seen before. If not, I'll experiment with an art film. There's no telling beforehand what my mood is going to be at any point.
+
+It's just as tricky to figure out what's good for us. We have no clue what will happen tomorrow. We have no clue what consequences our actions will have. (Read The Black Swan to get a flavour of that.) So we're really guessing and groping -- though sometimes with a lot of confidence.
+
+On the whole, it's difficult to figure out what to pick. So what do you do?
+
+This is completely outside the realm of time management. This is about choice. I have a few (bad) habits that guide me.
+
+   1. Follow your moods
+   2. Work less
+   3. Procrastinate
+
+Those are my principles. (But like Groucho Marx, I do have others.)
+
+Follow your moods
+
+There are times when people do certain things better. I've heard some people study best early in the morning. Others study best late at night. I don't know if there's any physiological benefit one way or the other, but even if it's psychological, it makes a huge difference to study when you think you'll learn better.
+
+Sometimes I'm in a mood to write articles. When I do, the article usually writes itself. If not, I could spend days at it without any progress.
+
+If there's any reality to this, then the best thing to do is to do what you feel like doing. You'll naturally accomplish this faster. That's typically what I do when I'm given any work. I usually wait until I just feel like it. Then it's usually a matter of a few hours before the job is done. Sometimes the mood doesn't quite arrive before the deadline, in which case there's always inspiration.
+
+Calvin & Hobbes: Do you have an idea for your story yet? No, I'm waiting for inspiration. You can't just turn on creativity like a faucet. You have to be in the right mood. What mood is that? Last-minute panic.
+
+Seriously: do what you feel like doing the most at the moment. That's a great way of becoming more efficient.
+
+In fact, I would go as far as saying, mood management is more important than time management. Moods are more precious than time. If you're in a mood to call people, pick up the phone and talk to folks you've been out of touch with. That mood is rarer than the time to make calls. (At least for me, the reason I am not in touch is because I'm not in a mood -- not because I don't have time.)
+
+Optimise that mood. Do what you're in a mood for. And when your mood changes, go with the flow. Do a lot more of what you feel like doing. You'll do more (which is probably good), and of what you like (which is certainly good).
+
+Work less
+
+I've talked about this in Less is more. At the end of the day, 90% of the stuff you do is useless. So why do it? Just focus on the 10%.
+
+Procrastinate
+
+I can't put this better than Paul Graham's article on procrastination.
+
+    Good procrastination is avoiding errands to do real work.
+
+You won't know what the important 10% until much later, so you may as well wait to find out if it's important, and then do things.
+
+So what am I saying?
+
+    * Time management is about habits, not tips
+    * Picking what you do is more important than doing it efficiently
+    * But it's difficult to figure out what to pick
+    * So avoid doing stuff until you know it's worth doing
+    * Work when you're in the mood -- it's faster that way
+
+Think about it.
+Written on 31 Mar 2008 | comments
+Related articles:
+
+    * Reading books on a laptop
+    * Lazy bargain hunting
+    * Handling missing pages
+    * Monitoring site downtime
+    * Managing feed overload
+
+... and more of How I do things
+Reading books on a laptop
+
+I have the habit of reading books on the screen. It's something that started from the early 90s, when I got a copy of The MIT Guide to Lockpicking. Since I didn't have access to a printer, I'd spent hours poring over the document on the screen. And then I discovered Project Gutenburg...
+
+I've heard many people ask if I have a problem with this. Personally, no. I've been staring at screens from the age of 12, and I'm quite used to it. My job requires me to stare at a screen for most of the day anyway. (I'm not saying there's no a strain on the eye. My eyes are red at the end of the day. I don't know if they would be less red if I'd been staring at paper instead of a screen. But my glasses have remained roughly the same power over ~15 years, so it's probably not ruining my eyesight much.)
+
+To me, the main advantage of a book is that a book is a lot easier to handle.
+
+    * You can fit a book into your bag, sometimes into your pocket.
+    * You can hold it in your hand comfortably -- it's easy to grip, and light.
+    * You can open it instantly (no need to boot up).
+    * You can bookmark it (or even just remember the last page number) and quickly flip to that
+
+None of these is possible on a computer.
+
+Or is it?
+
+On a desktop, I agree -- it's impossible to read for long. Your back would kill you. I've done it for many years, and it's not worth the pain. With a laptop, however, you can lie down on the bed or sofa and read. It's a huge advantage. (For just this one reason alone, I'd suggest that everyone buy a laptop.)
+
+As for carrying books, I carry my laptop to work every day, so there's no incremental burden. But if you weren't doing that, it's probably not a great idea. When I travel on weekends, I'd much rather take a physical book than a laptop. This is probably the single biggest problem with a laptop -- that it doesn't travel as easy as a book.
+
+That's probably offset by the advantage that a laptop isn't really a book -- it's a library. I don't need to decide which book to read. I can bring them all along, pick what I like, and when I'm done, move on to the next. And I'm not restricted to books. I have a fairly good collection of movie scripts and comics. Depending on how long I have on the train, and my mood, I can pick between these.
+
+One thing that makes a laptop a lot easier to use is to rotate it.
+
+Laptop in landscape mode
+
+Laptop in portrait mode (rotated)
+
+If you hold the laptop this way, it's surprisingly easy to handle. I find that I can read this way even when standing on a crowded train — which is as much as I can expect from any book. (Strangely enough, it doesn't seem to attract too much attention on the train either.)
+
+If you have a decent graphics card, you can rotate your screen using the graphics properties. (I'm sure there are are hotkeys to do this. My two-year old daughter somehow knows them, and manages to turn the screen upside down in a fraction of a second, while I spend then next 5 minutes struggling to restore an upside-down screen.)
+
+If not, you can just use a PDF reader (like FoxIt, which is better than Acrobat Reader) to rotate the page by 90°.
+
+A laptop takes care of the problems of bookmarking and load time as well. I usually leave mine on hibernate, and it takes about 10 seconds to open up to where I left off. Sometimes I just leave the laptop on in the bag — for example if I'm changing trains.
+
+The other solution, of course, is to try an ebook reader. Given my laptop, I haven't tried one. But other than the ease of holding it, there's no big I see.
+
+The other question is, how do you find ebooks?. Other than buying them, I find that the easiest option is to search on Google. A surprisingly large number of them are indexed.
+
+Here's a custom search engine for ebooks:
+
+
+
+powered by
+
+eBook Search
+
+
+
+
+Written on 22 Feb 2008 | comments
+Related articles:
+
+    * Reading books on a laptop
+    * Lazy bargain hunting
+    * Handling missing pages
+    * Monitoring site downtime
+    * Managing feed overload
+
+... and more of How I do things
+Chaining functions in Javascript
+
+One of the coolest features of jQuery is the ability to chain functions. The output of a function is the calling object. So instead of writing:
+
+var a = $("<div></div>");
+a.appendTo($("#id"));
+a.hide();
+
+... I can instead write:
+
+$("<div></div>").appendTo($("#id")).hide();
+
+A reasonable number of predefined Javascript functions can be used this way. I make extensive use of it with the String.replace function.
+
+But where this feature is not available, you an create it in a fairly unobstrusive way. Just add this code to your script:
+
+Function.prototype.chain = function() {
+     var that = this;
+     return function() {
+         // New function runs the old function
+         var retVal = that.apply(this, arguments);
+         // Returns "this" if old function returned nothing
+         if (typeof retVal == "undefined") { return this; }
+ 		// else returns old value
+         else { return retVal; }
+     }
+};
+var chain = function(obj) {
+ 	for (var fn in obj) {
+ 		if (typeof obj[fn] == "function") {
+ 		    obj[fn] = obj[fn].chain();
+ 		}
+     }
+ 	return obj;
+}
+
+Now, chain(object) returns the same object, with all its functions replaced with chainable versions.
+
+What's the use? Well, take the Google AJAX search API. Normally, to search for the top 8 "Harry Potter" PDFs on esnips.com, I'd have to do:
+
+var searcher = new google.search.WebSearch();
+searcher.setQueryAddition("filetype:PDF");
+searcher.setResultSetSize(google.search.Search.LARGE_RESULTSET);
+searcher.setSiteRestriction("esnips.com");
+searcher.setSearchCompleteCallback(onSearch);
+searcher.execute("Harry Potter");
+
+Instead, I can now do this:
+
+chain(new google.search.WebSearch())
+     .setQueryAddition("filetype:PDF")
+     .setResultSetSize(google.search.Search.LARGE_RESULTSET)
+     .setSiteRestriction("esnips.com")
+     .setSearchCompleteCallback(onSearch)
+     .execute("Harry Potter");
+
+(On the whole, it's probably not worth the effort. Somehow, I just like code that looks like this.)
+Written on 18 Feb 2008 | comments
+Related articles:
+
+    * Statistically improbable phrases on Google AppEngine
+    * Chaining functions in Javascript
+    * Javascript error logging
+    * Website load distribution using Javascript
+
+... and more of Coding
+Older items
+Taare Zameen Par lyrics: The songs were moving enough. The lyrics turn out to be beautiful too. The beauty of the language really comes out with songs like these....
+Less is more: The hours in consulting are pretty long. 65 hours a week used to be my norm, and that's ignoring the travel time to and from work. So there wasn't too much life outside of work.... Business realities
+Lazy bargain hunting: I'm thinking of buying a digital keyboard with touch sensitive keys and MIDI support. (The one other thing that I thought off -- a pitch bend -- puts the keyboards out of my budget.) I'd like a good deal.... How I do things
+Implicit information: From what I've seen, puzzles and exam questions share two un-real-worldly characteristics. Firstly, you are guaranteed that a solution exists. Secondly, you are given that all the information provided to you is relevant.... Interviews
+Web lookup using Google Spreadsheets: I'd written earlier about Web lookup in Excel. I showed an example how you could create a movie wishlist that showed the links to the torrents from Mininova. You can do that even easier on Google Spreadsheets.... Excel tips
+Taare Zameen Par and Calvin: Watch this segment of Taare Zameen Par. Then check these Calvin & Hobbes strips. Bless them both -- Aamir and Bill.... Funny
+Tamil songs quiz - Enchanting first interludes: Some background scores just stay in your mind. Here is a tribute to 20 wonderful first interludes, dating from the 1980s to the 2000s. Can you guess which movies they are from?... Quizzes
+Javascript error logging: If something goes wrong with my site, I like to know of it. My top three problems are:  - The site is down  - A page is missing  - Javascript isn't working This is the last of 3 articles on these topics.... Coding
+Handling missing pages: If something goes wrong with my site, I like to know of it. My top three problems are:  - The site is down  - A page is missing  - Javascript isn't working This article covers the second topic.... How I do things
+Monitoring site downtime: If something goes wrong with my site, I like to know of it. My top three problems are:  - The site is down  - A page is missing  - Javascript isn't working I'll talk about how I manage these over 3 articles.... How I do things
+Managing feed overload: I have only two problems with Google Reader. The first is that it doesn't support authenticated feeds. Ideally, I'd have liked to have a single reading list that combines my e-mail with newsfeeds.... How I do things
+Scraping RSS feeds using XPath: If a site doesn't have an RSS feed, your simplest option is to use Page2Rss, which gives a feed of what's changed on a page. My needs, sometimes, are a bit more specific.... How I do things
+Advanced Google Reader: I've stopped visiting websites. No, really. There's only one website I visit these days. Google Reader. Google Reader is a feed reader. If you want to just catch up on the new stuff on a site, you can add the site to Google Reader.... How I do things
+Website load distribution using Javascript: My music search engine shows a list of songs as you type -- sort of like Google's autosuggest feature. I load my entire list of songs upfront for this to work.... Coding
+A busy break from blogging: Between July 17th and August 22nd, I saw 57 movies and read 7 books. There were Saturdays when I watched four movies back-to-back. (I tried five. Couldn't stay awake.) Amidst this, I also cooked, cleaned, shopped...... Top 10 lists
+Default camera ISO setting: In those early days, when all I had was an analog SLR, I had to make choices up-front. Do I buy an ISO 100 film for daytime shooting? (It's cheaper, besides.) Do I go in for the expensive ISO 1600 film for my fancy night shots?... How I do things
+Sanskrit transliterator: I've built a simple Sanskrit transliterator. Type English in the box below, and you'll see it in Sanskrit (unicode). For example, type yasya smaraNa maathreNa janma samsaara banDhanaath You can copy-paste the Sanskrit above into Microsoft Word, etc.... How I do things
+Tamil songs quiz 2006-2007: Here is the background music from some hit songs from 2006 and 2007. Can you guess which movie they are from? Don't worry about the spelling. Just spell it like it sounds, and the box will turn green.... Quizzes
+Making my music search engine faster: My music search engine takes quite a while to load (typically 40 seconds). That's an unusually long time for a page, given that most of the people that access it are on broadband connections, and are listening to music online.... How I do things
+Reducing the server load: I'm been using a shared hosting service with 100 WebSpace over the last 7 years. It's an ad-free account that offers 100MB of space and 3GB of bandwidth per month. Things were fine until two months ago, which was when my song search engines started attracting an audience.... How I do things
+Calvin and Hobbes animated: A Calvin and Hobbes cartoon, drawn by Dadomani.... Funny
+Dilbert Browser: Al Donovan has created a Dilbert repository by crawling United Media's site every day since 1996. I've made them a little easier to navigate. Click here to see the Dilbert Browser.... Funny
+Calvin and Hobbes Dad explains science: My second most favourite series from Calvin and Hobbes, where Dad teaches Calvin the wonders of science.... Funny
+Calvin and Hobbes Tracer Bullet 1: My all-time favourite series from Calvin and Hobbes.... Funny
+RSS feeds in Excel: The technique of Web lookups in Excel I described yesterday is very versatile. I will be running through some of the practical uses it can be put to over the next few days TO generalise things beyond just getting the Amazon price, I created a user-defined function called XPATH.... Excel tips
+Web lookup using Excel: Take a look at the Excel screenshot below. Yes, that's right. I have a user-defined function called AMAZONPRICE. And it returns these cameras' prices directly from Amazon.com. (Given the category and some keywords, it returns the price of the bestselling item on Amazon.com.) Here's the code behind the function.... Excel tips
+Science Fiction novels: Now that I'm well on my way to watching the Top 250 movies on IMDb, I'm slowly turned my attention to fiction. My interest is mainly in the Fantasy & Science Fiction area.... Top 10 lists
+Tamil spelling corrector: The Internet has a lot of tamil song lyrics in English. Finding them is not easy, though. Two problems. The lyrics are fragmented: there's no one site to search them.... How I do things
+Ivory sculptures: Ivory sculptures at the Guangzhou Chen Family Temple. The first two, especially, have spheres within spheres within spheres... which looks impossible to carve....
+Splitting a sentence into words: I often need to extract words out of sentences. It's one of the things I used to build the Statistically Improbable Phrases for Calvin and Hobbes. But splitting a sentence into words isn't as easy as you think.... How I do things
+Sparklines: John Resig has written a Sparklines library. Here's an example. I wrote that HTTP download speeds not linear 182,315,313,319,314,459,441,44 and that they flatten out over time. A linear line would look like this: 180,190,201,211,221,232,242,25 The little red line here is a sparkline that's based on real data....
+HTTP download speeds: In some of the Web projects I'm working on, I have a choice of many small files vs few big files to download. There are conflicting arguments. (Latency is more important than bandwidth these days.) I ran some tests, and the answer is rather easy.... How I do things
+All Your Base Are Belong To Us: (If you don't get it, see what All your base are belong to us means) via This is my pizza.... Funny
+7 little known ways to improve learning: 7 little known ways to improve learning....
+Crack Gmail Yahoo Mail and Hotmail passwords: MessenPass recovers passwords for instant messengers -- GTalk, Yahoo Messenger and Windows Messenger included. These passwords are the same as their corresponding e-mails (GMail and Yahoo Mail at least). via Amit....
+Tamil old song lyrics quiz: Here are words from the middle of 15 old songs (before 1970). Can you guess which movie they are from? Don't worry about the spelling. Just spell it like it sounds, and the box will turn green.... Quizzes
+How to access Gmail even if it is blocked: If you just want to check if you have new mail on Gmail, use Google's personalised home page and add Gmail to the homepage. This shows new mail and a few words as a snippet....
+Driving from California to Stockholm: Google Maps directions from California to Stockhom. Google suggests a "Swim across the Atlantic Ocean". 3,462 miles.... Funny
+Making a Media PC: Two weeks ago, I pulled together a Media PC. This has been a long-term ambition. I've always wanted to have a PC as the centre of all my media. To use it as a radio, TV, stereo system, CD player, DVD player, etc.... How I do things
+Justin TV: The Truman Show is on for real, on Justin.TV. Justin wears the camera 24 hours a day, 7 days a week. Even in the bathroom. Even on a date. This is really live....
+Sony Universal Warner and EMI the worst companies in 2007: RIAA wins the Worst Company in America 2007. The RIAA is mainly EMI, Sony, Universal and Warner....
+SD Burman songs quiz: Here is the background music from SD Burman's songs. Can you guess which movie they are from? Don't worry about the spelling. Just spell it like it sounds, and the box will turn green.... Quizzes
+Creating user friendly 404 pages: Creating user friendly 404 pages....
+Amazing physics experiments: Videos of amazing physics experiments....
+How Google Desktop ranks files: Google filed a patent for Google Desktop last month, that hints at how they rank search results. Last access time, where the item is stored, file type and file size are mentioned as factors, but there are probably some more left unmentioned....
+Link blog
+
+How to download Real Audio streams and convert Real Audio to MP3
+(19 Apr 2008)
+
+How do you stay emotionally efficient?
+(18 Apr 2008)
+
+The Private Life of Elevators
+(17 Apr 2008)
+
+Solving Crosswords Puzzles Together with Friends on Flickr
+Think Flickr is for sharing photos and videos ? Well some people have discovered another creative use of Flickr. They upload ... (16 Apr 2008)
+
+Your Session Has Timed Out
+(16 Apr 2008)
+
+Why There Aren't More Googles
+(15 Apr 2008)
+
+Viewfinder - Integrate Photos in a 3D World Model
+(15 Apr 2008)
+
+Google AJAX Search API - REST
+Google has brought back a REST search API. (14 Apr 2008)
+
+Revisiting "How Much Power Does My Laptop Really Use"?
+(14 Apr 2008)
+
+Embedding and Encoding in JavaScript
+A crude JavaScript implementation of the first stage of Super Mario Brothers has been making the rounds today. It's roughly ... (9 Apr 2008)
+
+OpenID for Google Accounts
+(9 Apr 2008)
+
+Ruby VM in JavaScript
+HotRuby is a project which aims to port the Ruby Virtual Machine over to ECMAScript (allowing it to run, directly, in a browser ... (8 Apr 2008)
+
+Something Important Is On The Horizon In The Music Business
+(5 Apr 2008)
+
+Why home ownership causes unemployment
+Because when unemployment hits a town, home owners are less likely to shift cities in search of a job (5 Apr 2008)
+
+Supercharge Your Camera with Open-Source CHDK Firmware
+(4 Apr 2008)
+
+Firefox 3's password remembering
+(2 Apr 2008)
+
+The Minimalist: You Use It Every Day. But Can You Make It Cook?
+(2 Apr 2008)
+
+Master the Art of Earbud Cord-Wrapping
+(1 Apr 2008)
+
+How To Save Large Google Maps
+Create your own road maps for offline use. (Uses a lot of system memory for large maps, but works quite well.) (28 Mar 2008)
+
+Content Syndication with Case-Hardened JavaScript
+(25 Mar 2008)
+
+See more...
+Sites
+
+   1. Songs online: Hindi, Tamil, Telugu, Malayalam, Kannada, Carnatic
+   2. Songs download: Hindi, Tamil, Telugu, Malayalam, Kannada
+   3. Movies: Tamil, My wishlist
+   4. Comics: Calvin & Hobbes, Dilbert, Garfield, Doonesbury, xkcd
+   5. Custom search engines: Indian torrents, Excel, eBooks, etc.
+   6. Transliterators: Sanskrit, Tamil
+   7. Statistically improbable phrases
+
+Contact
+S Anand
+Infosys Consulting
+London United Kingdom
++44 7957 440 260
+root dot node at gmail.com
+
+Is this a blog?
+    Not exactly. I just write articles, practice my web development, and link to interesting stuff.
+How often do you update?
+    Once a month these days. I update whenever I have something to say.
+Can I contact you?
+    Sure. Call me (+44 7957 440 260). Don't mail me: I rarely reply on e-mail.
+About me
+    S Anand, Bal, Bhalla, Stud, Prof, Chennai, Bangalore, London, Tokyo, Mumbai, London, Vidya Mandir, IIT Madras, IBM, IIM Bangalore, Lehman Brothers, LBS (London Business School), BCG (Boston Consulting Group), Infosys Consulting, Technology, Software, Internet, Mathematics, Physics, Books, Music, Movies, Photography
+
+What's on this site
+
+    * Home
+    * Sites
+          o Songs online: Hindi, Tamil, Telugu, Malayalam, Kannada, Carnatic
+          o Songs download: Hindi, Tamil, Telugu, Malayalam, Kannada
+          o Movies: Tamil, My wishlist
+          o Comics: Calvin & Hobbes, Dilbert, Garfield, Doonesbury, xkcd
+          o Custom search engines: Indian torrents, Excel, eBooks, etc.
+          o Transliterators: Sanskrit, Tamil
+          o Statistically improbable phrases
+    * Topics
+            Simple explanations	Business realities
+            Excel tips	How I do things
+            Chat transcripts	Quizzes
+            Top 10 lists	Interviews
+            Visualisation	Classical Ilayaraja
+            Interesting experiences	Bets and pranks
+            Short stories	Funny
+            London 2000	London 2005
+            Mumbai	Personal
+            Coding	My best links
+    * Search
+
+
+
+            powered by
+
+            www.s-anand.net
+
+
+
+
+    * Contact
+
+S Anand, Infosys Consulting, London UK. +44 7957 440 260
+
+Read my articles (RSS feed) via Google Reader or Bloglines
+
+Here's the RSS feed of links I find interesting
+
+Get updates of my articles on e-mail
