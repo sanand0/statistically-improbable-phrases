@@ -62,6 +62,8 @@ class SIW(webapp.RequestHandler):
         if not url:
             urls = list(set(v.url for v in db.GqlQuery("SELECT * FROM URLLog ORDER BY date DESC LIMIT 10")))
             self.response.out.write(template.render('index.html', {'urls': urls, 'usestop': 0}))
+        elif url.find('proboards') >= 0 or url.find('planetnana') >= 0 or url.find('limmon.net') >= 0:
+            self.response.out.write(template.render('index.html', {'urls': None, 'usestop': 0}))
         else:
             url = url.strip()
             usestop = self.request.get('usestop')
@@ -108,6 +110,17 @@ class SIW(webapp.RequestHandler):
             string = string + ">" + word + "</span>"
         return string
 
+class Del(webapp.RequestHandler):
+    def get(self, pattern):
+        urls = URLLog.all().order('-date').fetch(500)
+        for item in urls:
+            if item.url.find(pattern) >= 0:
+                self.response.out.write(item.url + "<br>")
+                item.delete()
+
 if __name__ == '__main__':
-    application = webapp.WSGIApplication([('/', SIW)], debug=True)
+    application = webapp.WSGIApplication([
+        ('/',           SIW),
+        ('/del/(.*)',   Del),
+    ], debug=True)
     wsgiref.handlers.CGIHandler().run(application)
