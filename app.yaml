@@ -7,6 +7,12 @@ handlers:
 - url: /
   script: sip.py
 
+- url: /del/.*
+  script: sip.py
+
+- url: /list/.*
+  script: sip.py
+
 - url: /i/(.*)
   static_files: i/\1
   upload: i/(.*)
